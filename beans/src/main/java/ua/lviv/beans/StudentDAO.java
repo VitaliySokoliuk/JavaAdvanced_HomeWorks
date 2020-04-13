@@ -1,12 +1,13 @@
 package ua.lviv.beans;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 //@Component
 public class StudentDAO {
@@ -27,11 +28,13 @@ public class StudentDAO {
     }
 
     public Student getById(int id){
-        for (Student s : studentList) {
-            if (id == s.getId())
-                return s;
+        Optional<Student> obj = studentList.stream().filter(x -> x.getId() == id).findFirst();
+        if(obj.isPresent()) {
+            return obj.get();
+        }else {
+            System.out.println("Student is absent");
+            return null;
         }
-        throw new RuntimeException("User is absent");
     }
 
     public void insert(int id, String name, int age){
@@ -40,32 +43,27 @@ public class StudentDAO {
     }
 
     public void delete(int id){
-        boolean search = false;
-        for (int i = 0; i < studentList.size(); i++) {
-            if (id == studentList.get(i).getId()) {
-                search = true;
-                studentList.remove(i);
-            }
-        }
-        if(!search)
-            System.out.println("Student is not found");
-        else
+        Optional<Student> obj = studentList.stream().filter(x -> x.getId() == id).findFirst();
+        if(obj.isPresent()) {
+            Student s = obj.get();
+            studentList.remove(s);
             System.out.println("Student successfully deleted");
+        }else {
+            System.out.println("Student is absent");
+        }
     }
 
     public void update(int id, String name, int age){
-        boolean search = false;
-        for (int i = 0; i < studentList.size(); i++) {
-            if (id == studentList.get(i).getId()) {
-                studentList.get(i).setName(name);
-                studentList.get(i).setAge(age);
-                search = true;
-            }
-        }
-        if(!search)
-            System.out.println("Student is not found");
-        else
+
+        boolean find = studentList.stream().anyMatch(x -> x.getId() == id);
+        if(find){
+            Student student = studentList.stream().filter(x -> x.getId() == id).findFirst().get();
+            student.setAge(age);
+            student.setName(name);
             System.out.println("Student successfully updated");
+        }else{
+            System.out.println("Student is absent");
+        }
     }
 
     @PostConstruct

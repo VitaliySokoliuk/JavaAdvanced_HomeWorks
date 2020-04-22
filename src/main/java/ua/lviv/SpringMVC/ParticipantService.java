@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.SpringMVC.entities.Participant;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,11 @@ public class ParticipantService {
 
     public void delete(int id){
         participantRepo.deleteById(id);
+    }
+
+    @Transactional
+    public byte[] getPhoto(int id){
+        return participantRepo.getPhoto(id);
     }
 
 }

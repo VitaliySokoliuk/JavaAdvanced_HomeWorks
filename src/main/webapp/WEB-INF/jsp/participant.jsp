@@ -32,6 +32,7 @@
                     <th>Id</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Photo</th>
                     <th>Edit</th>
                     <th>Delete</th>
                 </tr>
@@ -42,6 +43,16 @@
                         <td>${elem.id}</td>
                         <td>${elem.name}</td>
                         <td>${elem.email}</td>
+                        <c:if test = "${elem.photo == null}">
+                            <td>
+                                <img src="https://img.favpng.com/7/5/8/computer-icons-font-awesome-user-font-png-favpng-YMnbqNubA7zBmfa13MK8WdWs8.jpg" width="50px">
+                            </td>
+                        </c:if>
+                        <c:if test = "${elem.photo != null}">
+                            <td>
+                                <img src="/Club/participant/download/${elem.id}" width="50px">
+                            </td>
+                        </c:if>
                         <td><a href="/Club/participant/update?id=${elem.id}">edit</a></td>
                         <td><a href="/Club/participant/delete?id=${elem.id}">delete</a></td>
                     </tr>
@@ -65,7 +76,18 @@
             <div class = "container mt-3">
                 <h1 class="mb-3">Edit participant</h1>
                 <div>
-                    <form method="post">
+                    <form enctype="multipart/form-data" method="post">
+                        <c:if test = "${particip.photo == null}">
+                            <td>
+                                <img src="https://img.favpng.com/7/5/8/computer-icons-font-awesome-user-font-png-favpng-YMnbqNubA7zBmfa13MK8WdWs8.jpg" width="150px">
+                            </td>
+                        </c:if>
+                        <c:if test = "${particip.photo != null}">
+                            <td>
+                                <img src="/Club/participant/download/${particip.id}" width="150px">
+                            </td>
+                        </c:if> <br> <br>
+                        <input type="file" name="file"><br><br>
                         <input type="text" value="${particip.name}" name = "name" placeholder="Input a participant name" class="form-control"><br>
                         <input type="email" value="${particip.email}" name = "email" placeholder="Input a participant email" class="form-control"><br>
                         <button type="submit" class="btn btn-dark">Edit</button><br>
@@ -73,30 +95,6 @@
                 </div>
             </div>
         </c:when>
-
-<%--        <c:when test="${mode == 'BOOK_EDIT' || mode == 'BOOK_CREATE'}">--%>
-<%--            <form action="${mode == 'BOOK_EDIT' ? "/ILibrary/books/save": "/ILibrary/books/create"}" method="POST">--%>
-<%--                <c:choose>--%>
-<%--                    <c:when test="${mode == 'BOOK_EDIT'}">--%>
-<%--                        <input type="hidden" value="${book.id}" class="form-control" id="id" name="id">--%>
-<%--                    </c:when>--%>
-<%--                </c:choose>--%>
-
-<%--                <div class="form-group">--%>
-<%--                    <label for="bookName">Book Name:</label> <input type="text"--%>
-<%--                                                                    class="form-control" id="name" name="name"--%>
-<%--                                                                    value="${book.name}">--%>
-<%--                </div>--%>
-
-
-<%--                <div class="form-group">--%>
-<%--                    <label for="author">Author:</label> <input type="text"--%>
-<%--                                                               class="form-control" id="author" name="author"--%>
-<%--                                                               value="${book.author}">--%>
-<%--                </div>--%>
-<%--                <button type="submit" class="btn btn-default">Submit</button>--%>
-<%--            </form>--%>
-<%--        </c:when>--%>
 
     </c:choose>
 </div>

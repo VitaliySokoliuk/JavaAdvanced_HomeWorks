@@ -15,12 +15,22 @@ public class Participant {
     private String level;
     @Column(name = "primary_skill")
     private String primarySkill;
+    @Lob
+    private byte[] photo;
 
     public Participant(String name, String email, String level, String primarySkill) {
         this.name = name;
         this.email = email;
         this.level = level;
         this.primarySkill = primarySkill;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 
     public Participant(String name, String email) {

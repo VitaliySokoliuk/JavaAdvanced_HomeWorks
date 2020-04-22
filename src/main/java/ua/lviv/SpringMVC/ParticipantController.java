@@ -1,11 +1,18 @@
 package ua.lviv.SpringMVC;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ua.lviv.SpringMVC.entities.Participant;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Optional;
 
 @Controller
@@ -52,16 +59,32 @@ public class ParticipantController {
     }
 
     @PostMapping("/update")
-    public String postUpdate(@RequestParam int id, @RequestParam String name, @RequestParam String email, HttpServletRequest req) {
+    public String postUpdate(@RequestParam MultipartFile file, @RequestParam int id, @RequestParam String name, @RequestParam String email, HttpServletRequest req) {
         if(!participantService.existById(id)){
             return "redirect:all";
         }
-        Participant participant = participantService.findById(id).get();
-        participant.setName(name);
-        participant.setEmail(email);
-        participantService.save(participant);
-        return "redirect:all";
+        try {
+            Participant participant = participantService.findById(id).get();
+            String contentType = file.getContentType();
+            if(contentType != null && contentType.startsWith("image")){
+                participant.setPhoto(file.getBytes());
+            }
+            participant.setName(name);
+            participant.setEmail(email);
+            participantService.save(participant);
+            req.setAttribute("id", id);
+            return "redirect:all";
+        } catch (IOException e) {
+            throw new RuntimeException("Could not save file" + file.getOriginalFilename());
+        }
     }
+
+    @GetMapping("download/{id}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable int id) {
+        byte[] photo = participantService.getPhoto(id);
+        return ResponseEntity.ok().body(new ByteArrayResource(photo));
+    }
+
 
     @GetMapping("/delete")
     public String postDelete(@RequestParam int id, HttpServletRequest req) {
@@ -71,24 +94,5 @@ public class ParticipantController {
         participantService.delete(id);
         return "redirect:all";
     }
-
-//    @PostMapping("/save")
-//    public String save(@ModelAttribute Participant participant, HttpServletRequest req) {
-//        participantService.save(participant);
-//        req.setAttribute("participants", participantService.selectAll());
-//        req.setAttribute("mode", "PARTICIPANT_VIEW");
-//        return "participant";
-//    }
-
-
-
-//    @GetMapping("/delete")
-//    public String deleteBook(@RequestParam(name = "id") int bookId, HttpServletRequest req) {
-//        participantService.delete(bookId);
-//        req.setAttribute("books", participantService.findAllBooks());
-//        req.setAttribute("mode", "BOOK_VIEW");
-//        // Todo Fix
-//        return "/books/";
-//    }
 
 }
